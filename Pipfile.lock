@@ -55,7 +55,7 @@
             "index": "pypi",
             "version": "==20.0.4"
         },
-        "psycopg2": {
+        "psycopg2-binary": {
             "hashes": [
                 "sha256:132efc7ee46a763e68a815f4d26223d9c679953cd190f1f218187cb60decf535",
                 "sha256:2327bf42c1744a434ed8ed0bbaa9168cac7ee5a22a9001f6fc85c33b8a4a14b7",
