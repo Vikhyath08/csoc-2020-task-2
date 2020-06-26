@@ -4,6 +4,7 @@ from store.models import *
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+import datetime
 
 # Create your views here.
 
@@ -12,9 +13,11 @@ def index(request):
 
 def bookDetailView(request, bid):
     template_name = 'store/book_detail.html'
+    book = Book.objects.get(pk = bid)
+    num_available = BookCopy.objects.filter(status__exact = True, book__exact = book).count()
     context = {
-        'book': None, # set this to an instance of the required book
-        'num_available': None, # set this to the number of copies of the book available, or 0 if the book isn't available
+        'book': book, # set this to an instance of the required book
+        'num_available': num_available, # set this to the number of copies of the book available, or 0 if the book isn't available
     }
     # START YOUR CODE HERE
     
@@ -25,9 +28,14 @@ def bookDetailView(request, bid):
 @csrf_exempt
 def bookListView(request):
     template_name = 'store/book_list.html'
+    get_data = request.GET
+    if len(get_data) > 0:
+        books = Book.objects.filter(title__icontains = get_data['title'], author__icontains = get_data['author'], genre__icontains = get_data['genre'])
+    else:
+        books = Book.objects.all()
     context = {
-        'books': None, # set this to the list of required books upon filtering using the GET parameters
-                       # (i.e. the book search feature will also be implemented in this view)
+        'books': books, # set this to the list of required books upon filtering using the GET parameters 
+        # (i.e. the book search feature will also be implemented in this view)
     }
     get_data = request.GET
     # START YOUR CODE HERE
@@ -38,8 +46,9 @@ def bookListView(request):
 @login_required
 def viewLoanedBooks(request):
     template_name = 'store/loaned_books.html'
+    books = BookCopy.objects.filter(borrower__exact = request.user)
     context = {
-        'books': None,
+        'books': books,
     }
     '''
     The above key 'books' in the context dictionary should contain a list of instances of the 
@@ -54,16 +63,24 @@ def viewLoanedBooks(request):
 @csrf_exempt
 @login_required
 def loanBookView(request):
+    bid = request.POST.get('bid')
+    book = BookCopy.objects.filter(status__exact = True, book__exact = Book.objects.get(pk = bid))
+    message = 'success' if book else 'failure'
+    if message == 'success':
+        book[0].borrow_date = datetime.date.today()
+        book[0].status = False
+        print(book[0].status)
+        book[0].borrower = request.user
+        book[0].save()
+
     response_data = {
-        'message': None,
+        'message': message,
     }
     '''
     Check if an instance of the asked book is available.
     If yes, then set the message to 'success', otherwise 'failure'
     '''
     # START YOUR CODE HERE
-    book_id = None # get the book id from post data
-
 
     return JsonResponse(response_data)
 
@@ -77,6 +94,20 @@ to make this feature complete
 @csrf_exempt
 @login_required
 def returnBookView(request):
-    pass
+    bid  = request.POST.get('bid')
+    book = BookCopy.objects.get(pk = bid)
+    if book:
+        message = 'success'
+        book.borrow_date = None
+        book.status = True
+        book.borrower = None
+        book.save()
+    else:
+        message = 'failure'
+    response_data = {
+        'message': message,
+    }
+    return JsonResponse(response_data)
+    
 
 

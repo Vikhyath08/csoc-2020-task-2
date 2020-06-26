@@ -1,0 +1,61 @@
+{% extends "store/base.html" %}
+{% block content %}
+    <div id="register">
+        <form class="form-horizontal" name="RegisterForm" action="/register/" method="post">
+        {% csrf_token %}
+        {% if next %}
+            <input type="hidden" name="next" value="{{ next }}" />
+        {% endif %}
+        <div class="control-group">
+            <label class="control-label" for="First_Name">First Name</label>
+            <div class="controls">
+                <input type="text" id="first_name" name="first_name"  placeholder="First Name">
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="Last_Name">Last Name</label>
+            <div class="controls">
+                <input type="text" id="last_name" name="last_name"  placeholder="Last Name">
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="email">E-mail ID</label>
+            <div class="controls">
+                <input type="email" id="email" name="email"  placeholder="E-Mail ID">
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="username">Username</label>
+            <div class="controls">
+                <input type="text" id="username" name="username"  placeholder="Username">
+            </div>
+        </div>
+        <br/>
+        <div class="control-group">
+            <label class="control-label" for="password">Password</label>
+            <div class="controls">
+                <input type="password" name="password" id="password" placeholder="Password">
+            </div>
+        </div>
+        <br/>
+        <div class="control-group">
+            <label class="control-label" for="password">Confirm Password</label>
+            <div class="controls">
+                <input type="password" name="confpass" id="confpass" placeholder="Confirm Password">
+            </div>
+        </div>
+        <br/>
+        <div class="control-group">
+            <div class="controls">
+                <button type="submit" class="btn" style="background-color:black;color:white">Register</button>
+            </div>
+        </div>
+        </form>
+    </div>
+    {% for message in messages %}
+        <div class="alert alert-danger">
+            <a class="close" href="#" data-dismiss="alert">×</a>
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endblock %}
