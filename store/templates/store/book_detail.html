@@ -14,14 +14,22 @@
     <dd>{{ book.author }}</dd>
     <dt>Description:</dt>
     <dd>{{ book.description }}</dd>
-    <dt>Rating:</dt>
-    <dd>{{ book.rating }}</dd>
+	<dt>Rating:</dt>
+	{% if book.rating < 0 %}
+		<dd>Not Rated</dd>
+	{% else %}
+		<dd>{{ book.rating }}</dd>
+	{% endif %}
     <dt>MRP:</dt>
     <dd>Rs. {{ book.mrp }}</dd>
     <dt>Available Copies:</dt>
     <dd>{{ num_available }}</dd>
 </dl>
-<button class="btn btn-primary" id="loan-button">Loan {{ book.title }}</button>
+{% if user.is_authenticated %}
+	<button class="btn btn-primary" id="loan-button">Loan {{ book.title }}</button>
+{% else %}
+	<button class="btn btn-primary" id="loan-button-disabled" title = "You must login First" disabled>Loan {{ book.title }}</button>
+{% endif %}
 <script>
 $("#loan-button").click(function(){
     $.ajax({
@@ -40,10 +48,46 @@ $("#loan-button").click(function(){
 			}
 		},
 		error: function(xhr, status, err){
-			alert("Some error occured while issuing");
+			alert("Some error occured while issuing (You are probably not logged in).");
 		}
 
 	})
 })
 </script>
+<br/>
+<br/>
+<form class = "form-horizontal" name = "RatingForm" action = "rate/" method = "post">
+	{% csrf_token %}
+	<label class = "control-label" for="rating">Rate This Book</label>
+	<input type = "number" min = "0" max = "10" step = "0.01" placeholder = "Rating" name = "rating">
+	{% if user.is_authenticated %}
+		<button type="submit" class="btn" style="background-color:black;color:white">Rate {{ book.title }}</button>
+	{% else %}
+	<button type="button" class="btn" style="background-color:black;color:white" title = "You must login first" disabled>Rate {{ book.title }}</button>
+	{% endif %}
+</form>
+
+
+{% if messages %}
+	{% for message in messages %}
+		{% if message.tags == 'success' %}
+			<div class="alert alert-success">
+				{{ message }}
+			</div>
+		{% elif message.tags == 'info'%}
+			<div class="alert alert-info">
+				{{ message }}
+			</div>
+		{% elif message.tags == 'warning'%}
+			<div class="alert alert-danger">
+				{{ message }}
+			</div>
+		{% elif message.tags == 'error'%}
+			<div class="alert alert-danger">
+				{{ message }}
+			</div>
+		{% endif %}
+	{% endfor %}
+{% endif %}
+
 {% endblock %}

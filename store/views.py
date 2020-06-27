@@ -1,10 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.shortcuts import get_object_or_404
 from store.models import *
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import datetime
+from django.contrib import messages
 
 # Create your views here.
 
@@ -110,4 +111,37 @@ def returnBookView(request):
     return JsonResponse(response_data)
     
 
+@login_required
+def rateBookView(request, bid):
+    book = Book.objects.get(pk = bid)
+    try:
+        usrRating = float(request.POST.get('rating'))
+    except:
+        messages.error(request, "Please Enter a Valid Rating")
+        return redirect(f'/book/{bid}/')
+    if usrRating <= 10 and usrRating >= 0:
+        oldRating = Ratings.objects.filter(book__exact = book, borrower__exact = request.user)
+        print(oldRating)
+        if oldRating.exists():
+            oldRating = Ratings.objects.get(book__exact = book, borrower__exact = request.user)
+            oldRating.rating = usrRating
+            oldRating.save()
+            print("New Rating:", oldRating)
+        else:
+            Ratings.objects.create(book = book, borrower = request.user, rating = usrRating)
+            print("New Rating Registered")
+        messages.success(request, 'Your Rating has been registered successfully!')
+    else:
+        messages.error(request,'Please Enter A Valid Rating')
+    ratingsOfBook = Ratings.objects.filter(book__exact = book)
+    if ratingsOfBook.exists():
+        avg = 0
+        i = 0
+        for ratingOfBook in ratingsOfBook:
+            i+=1
+            avg = avg + ratingOfBook.rating
+        avg = avg / i
+        book.rating = avg
+        book.save()
+    return redirect(f'/book/{bid}/')
 

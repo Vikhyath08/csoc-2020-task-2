@@ -8,10 +8,11 @@ class Book(models.Model):
     genre = models.CharField(max_length=50)
     description = models.TextField(null=True)
     mrp = models.PositiveIntegerField()
-    rating = models.FloatField(default=0.0)
+    rating = models.FloatField(default = -1)
 
     class Meta:
         ordering = ('title',)
+        unique_together = [['title', 'author']]
 
     def __str__(self):
         return f'{self.title} by {self.author}'
@@ -30,3 +31,11 @@ class BookCopy(models.Model):
         else:
             return f'{self.book.title} - Available'
 
+
+class Ratings(models.Model):
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    borrower = models.ForeignKey(User, related_name='rater', on_delete=models.CASCADE) # If User leaves, his/her rating should be deleted
+    rating = models.FloatField(default = 0.0)
+
+    def __str__(self):
+        return f'{self.book} rated {self.rating} by {self.borrower}'

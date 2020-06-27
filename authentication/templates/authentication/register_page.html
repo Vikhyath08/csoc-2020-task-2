@@ -30,14 +30,12 @@
                 <input type="text" id="username" name="username"  placeholder="Username">
             </div>
         </div>
-        <br/>
         <div class="control-group">
             <label class="control-label" for="password">Password</label>
             <div class="controls">
                 <input type="password" name="password" id="password" placeholder="Password">
             </div>
         </div>
-        <br/>
         <div class="control-group">
             <label class="control-label" for="password">Confirm Password</label>
             <div class="controls">
@@ -52,10 +50,27 @@
         </div>
         </form>
     </div>
-    {% for message in messages %}
-        <div class="alert alert-danger">
-            <a class="close" href="#" data-dismiss="alert">×</a>
-            {{ message }}
-        </div>
-    {% endfor %}
+
+    {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == 'success' %}
+                <div class="alert alert-success">
+                    {{ message }}
+                </div>
+            {% elif message.tags == 'info'%}
+                <div class="alert alert-info">
+                    {{ message }}
+                </div>
+            {% elif message.tags == 'warning'%}
+                <div class="alert alert-danger">
+                    {{ message }}
+                </div>
+            {% elif message.tags == 'error'%}
+                <div class="alert alert-danger">
+                    {{ message }}
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
 {% endblock %}

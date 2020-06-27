@@ -57,7 +57,7 @@ def registerView(request):
                     login(request, user)
                     return redirect('/')
                 else:
-                    messages.error(request,'User Registered Successfully but unable to login. Try again.')
+                    messages.success(request,'User Registered Successfully.')
             else:
                 messages.error(request,'Passwords Do Not Match.')
         else:
