@@ -2,7 +2,7 @@
 
 I have completed the following tasks
 
-- [ ] Stage 1
-- [ ] Stage 2
-- [ ] Stage 3
-- [ ] Stage 4
+- [x] Stage 1
+- [x] Stage 2
+- [x] Stage 3
+- [x] Stage 4
